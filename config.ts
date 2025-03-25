@@ -1,5 +1,4 @@
 interface MyPluginSettings {
-  mySetting: string;
   HALO_BASEURL: string;
   HALO_TOKEN: string;
   IMAGE_URL: string;

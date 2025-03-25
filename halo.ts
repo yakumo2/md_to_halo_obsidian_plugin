@@ -259,7 +259,7 @@ const handleImage = async (match: RegExpMatchArray, mdPath: string, app: any): P
   const altText = match[1];
   let imgUrl = match[2];
   let badURL = false;
-  console.log(`image url ${imgUrl}`);
+//  console.log(`image url ${imgUrl}`);
 
   // 检查是否为http开头
   if (altText.startsWith('http') && badURL) {
@@ -342,12 +342,7 @@ const handleImage = async (match: RegExpMatchArray, mdPath: string, app: any): P
     // 提取目录路径
     const folder_path = mdPath.split('/').slice(0, -1).join('/') + (mdPath.includes('/') ? '/' : '');
     
-    // 处理相对路径
-    //let absPath = imgUrl;
-    //if (imgUrl.startsWith('./')) {
-    //  absPath = folder_path + imgUrl.slice(2);
-    //}
-    //console.log('解析后的绝对路径:', absPath);
+
 
     // 添加路径有效性检查
     if (!imgUrl || typeof imgUrl !== 'string') {
@@ -355,14 +350,11 @@ const handleImage = async (match: RegExpMatchArray, mdPath: string, app: any): P
       return `<img src="${imgUrl}" alt="${altText}" />`;
     }
 
-    //if (!fs.existsSync(absPath)) {
-    //  console.error('文件不存在:', absPath);
-    //  return `<img src="${imgUrl}" alt="${altText}" />`;
-    //}
+
     let imagePath = `${folder_path}/${originalImgUrl}`
     console.log(`uploading image : ${imagePath}`);
-   //const [url, thumb] = await imgURL(app, originalImgUrl); // 修改: 直接传递 app 参数
-   const [url, thumb] = await imgURL(app, imagePath); // 修改: 直接传递 app 参数
+  
+    const [url, thumb] = await imgURL(app, imagePath); // 修改: 直接传递 app 参数
     console.log(`url: ${url}, thumb: ${thumb}`);
     if (url && thumb) {
       // 更新markdown中的图片alt为图床地址
@@ -385,8 +377,8 @@ export const post_md = async (path: string, app: any): Promise<void> => {
     // 添加发布开始通知
     //app.vault.createNotice('开始发布Markdown文章...', 5000, 'normal');
     new Notice('开始发布Markdown文章...', 5000);
-    console.log(`halo baseurl: ${baseurl}`)
-    console.log(`halo token: ${token}`)
+    //console.log(`halo baseurl: ${baseurl}`)
+    //console.log(`halo token: ${token}`)
     //console.log(`image url: ${plugin.settings.IMAGE_URL}`)
     //console.log(`image token: ${plugin.settings.IMAGE_TOKEN}`)
     //const md_content = fs.readFileSync(path, 'utf-8');
@@ -401,7 +393,7 @@ export const post_md = async (path: string, app: any): Promise<void> => {
     if (yaml_match) {
         console.log('found yaml');
         const yaml_content = yaml_match[1];
-        console.log('Parsed YAML content:', yaml_content); // 添加调试日志
+        //console.log('Parsed YAML content:', yaml_content); // 添加调试日志
         const title_match = yaml_content.match(/^title:\s*(.*)$/m);
         if (title_match) {
             title = title_match[1].trim();
@@ -420,7 +412,7 @@ export const post_md = async (path: string, app: any): Promise<void> => {
             let match;
             while ((match = image_pattern.exec(content)) !== null) {
                 const imgHtml = await handleImage(match, path, app);
-                console.log('imgHtml:', imgHtml);
+                //console.log('imgHtml:', imgHtml);
                 content = content.replace(match[0], imgHtml);
             }
             const md = MarkdownIt({ html: true });

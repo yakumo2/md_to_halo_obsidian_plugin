@@ -32,26 +32,18 @@ export async function imgURL(app: any, filePath: string): Promise<[string | null
   }
 
   try {
-    console.log(`开始读取文件1: ${filePath}`);
-    // 使用 fs.readFileSync 读取文件内容
-    // 获取相对于 Vault 的路径
-    //const relativePath = app.vault.getRelativePath(filePath);
-    //console.log(`开始读取文件2: ${relativePath}`);
-    // 使用相对路径读取文件
-    //const vaultName = app.vault.getName();
-    //const relativePath = `${vaultName}/${filePath}`;
-    //console.log(`开始读取文件2: ${relativePath}`);
+    //console.log(`开始读取文件1: ${filePath}`);
     const fileBuffer = await app.vault.adapter.readBinary(filePath);
-    console.log(`文件大小: ${fileBuffer.length} bytes`);
+    //console.log(`文件大小: ${fileBuffer.length} bytes`);
     
     const formData = new FormData();
-    console.log("append image");
+    //console.log("append image");
     formData.append('image', new Blob([fileBuffer], { type: 'image/png' }), filePath.split('/').pop());
-    console.log("append token");
+    //console.log("append token");
     formData.append('token', token);
-    console.log(`token: ${token}`);
+    //console.log(`token: ${token}`);
 
-    console.log(`准备发送请求到: ${url}`);
+    //console.log(`准备发送请求到: ${url}`);
     const response = await axios.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -59,9 +51,9 @@ export async function imgURL(app: any, filePath: string): Promise<[string | null
       }
     });
 
-    console.log(`收到响应，状态码: ${response.status}`);
-    console.log(`响应头: ${JSON.stringify(response.headers)}`);
-    console.log(`响应体大小: ${response.data.length} bytes`);
+    //console.log(`收到响应，状态码: ${response.status}`);
+    //console.log(`响应头: ${JSON.stringify(response.headers)}`);
+    //console.log(`响应体大小: ${response.data.length} bytes`);
 
     if (response.status === 200) {
       const jsonData = response.data;

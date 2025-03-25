@@ -5,7 +5,6 @@ import { setSettings } from './config.ts';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
-	mySetting: string;
 	HALO_BASEURL: string;
 	HALO_TOKEN: string;
 	IMAGE_URL: string;
@@ -13,7 +12,6 @@ interface MyPluginSettings {
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default',
 	HALO_BASEURL: '',
 	HALO_TOKEN: '',
 	IMAGE_URL: '',
@@ -37,8 +35,8 @@ export default class MyPlugin extends Plugin {
 				const filePath = activeView.file?.path;
 				if (filePath) {
 					const file = this.app.vault.getAbstractFileByPath(filePath);
-					console.log(`file path is ${filePath}`)
-					console.log(`halo baseurl: ${this.settings.HALO_BASEURL}`)
+					//console.log(`file path is ${filePath}`)
+					//console.log(`halo baseurl: ${this.settings.HALO_BASEURL}`)
 					if (file) {
 						//const fullPath = this.app.vault.adapter.getFullPath(file.path);
 						//console.log(`full path is ${fullPath}`)
@@ -137,32 +135,16 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+  display(): void {
+    const {containerEl} = this;
+    containerEl.empty();
 
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+    // 添加通用设置标题
+    containerEl.createEl('h2', { text: 'General Setting' });
 
 		new Setting(containerEl)
 			.setName('HALO Base URL')
-			.setDesc('Halo API的基础地址')
+			.setDesc('Halo博客的地址')
 			.addText(text => text
 				.setPlaceholder('http://halo.example.com')
 				.setValue(this.plugin.settings.HALO_BASEURL)
@@ -184,7 +166,7 @@ class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Image URL')
-			.setDesc('图片上传API地址')
+			.setDesc('easyimage2的API地址')
 			.addText(text => text
 				.setPlaceholder('http://image.example.com/api')
 				.setValue(this.plugin.settings.IMAGE_URL)
@@ -195,7 +177,7 @@ class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Image Token')
-			.setDesc('图片上传API的访问令牌')
+			.setDesc('easyimage2图床API的访问令牌')
 			.addText(text => text
 				.setPlaceholder('your_image_token')
 				.setValue(this.plugin.settings.IMAGE_TOKEN)
@@ -203,5 +185,21 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.IMAGE_TOKEN = value;
 					await this.plugin.saveSettings();
 				}));
-	}
+
+ 
+    const donateDiv = containerEl.createDiv();
+    donateDiv.style.marginTop = '2em';
+
+    
+    donateDiv.createEl('p', {
+      text: 'If you find this plugin helpful, send me an email to give some encouragement.',
+      attr: { style: 'text-align: center; margin: 10px 0;' }
+    });
+    
+    const link = donateDiv.createEl('a', {
+      text: 'Send Me An Email',
+      href: 'mailto:monkhead@126.com',
+      attr: { style: 'display: block; text-align: center;' }
+    });
+  }
 }
