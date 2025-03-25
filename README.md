@@ -59,3 +59,7 @@ halo_link: http://halo.kanepo.com/archives/f5b036d1-8290-41da-a928-220c0ee0ffe4
 # 使用
 
 - 点击插件按钮(一个骰子🎲)，上传当前文件
+
+# 清除
+- 如果需要重新发布，或者需要发布到其他halo博客，需要清除halo_post_name和halo_link。
+- 如果要重新上传图片，需要清除图片的alt。清除图片的alt比较复杂，需要安装`Text Finder`(作者:`hafuhafu`)这个插件才能支持正则表达式的查找和替换，可以用下面的正则表达式：`!\[http://.*?\]`
