@@ -1,3 +1,7 @@
+# 关于 🎲 md-to-halo 🎲
+
+本插件是为了把obsidian的markdown文件上传到halo博客中。
+
 # 安装
 
 进入vault的plugin文件夹，一般是`/Users/<user>/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault name>/.obsidian/plugins/`
@@ -16,11 +20,13 @@ pnpm run dev
 如果对插件有修改，需要重新`pnpm run dev`，然后回到preferences中关闭和重新启用插件，让修改生效。
 
 # 需求
+
 - Halo博客 [官网](https://www.halo.run/)
 - easyimage2图床 [github](https://github.com/icret/EasyImages2.0)
 - 1panel [官网](https://1panel.cn/) 非必须，我是用1panel安装的halo和easyimage2
 
 # 设定
+
 在插件设置中，设定下列参数:
 - "HALO_BASEURL": "http://your.halo.com" 你的halo地址
 - "HALO_TOKEN": "pat_eyJr" 在halo中生成的token
@@ -28,6 +34,7 @@ pnpm run dev
 - "IMAGE_TOKEN": "xx111yyy222zzz" 你的easyimage2的token
 
 # 功能
+
 - 把markdown文件转为html上传到halo
 - 读取yaml中的title(如果没有则用文件名)和tags，并上传到halo
 - 自动添加halo的文章id和链接到yaml中
@@ -50,4 +57,5 @@ halo_link: http://halo.kanepo.com/archives/f5b036d1-8290-41da-a928-220c0ee0ffe4
 ```
 
 # 使用
+
 - 点击插件按钮(一个骰子🎲)，上传当前文件
