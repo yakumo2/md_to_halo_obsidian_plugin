@@ -1,0 +1,11 @@
+{
+	"id": "md-to-halo",
+	"name": "MD to Halo",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Send your markdown files to Halo",
+	"author": "Yakumo2",
+	"authorUrl": "https://halo.yakumo2.uk",
+	"fundingUrl": "https://halo.yakumo2.uk",
+	"isDesktopOnly": false
+}
