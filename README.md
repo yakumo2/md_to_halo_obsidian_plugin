@@ -67,7 +67,14 @@ halo_link: http://halo.kanepo.com/archives/f5b036d1-8290-41da-a928-220c0ee0ffe4
 # 开发相关
 
 测试环境: `/Users/eric/Library/Mobile Documents/iCloud~md~obsidian/Documents/SandBox/.obsidian/plugins/md-to-halo-dev`
-在测试环境中进行开发，`git push`
+在测试环境中进行开发，`git push -u origin main`
+
+## 开发环境设定
+有时候需要检查一下本地git仓库配置是否正确：
+`git remote -v`
+如果没有配置正确，需要配置：
+`git remote add origin https://github.com/yakumo2/md_to_halo_obsidian_plugin.git`
+
 
 正式环境: `/Users/eric/Library/Mobile Documents/iCloud~md~obsidian/Documents/Yakumo/.obsidian/plugins/md-to-halo`
 在正式环境中进行发布，`git pull`
