@@ -63,3 +63,11 @@ halo_link: http://halo.kanepo.com/archives/f5b036d1-8290-41da-a928-220c0ee0ffe4
 # 清除
 - 如果需要重新发布，或者需要发布到其他halo博客，需要清除halo_post_name和halo_link。
 - 如果要重新上传图片，需要清除图片的alt。清除图片的alt比较复杂，需要安装`Text Finder`(作者:`hafuhafu`)这个插件才能支持正则表达式的查找和替换，可以用下面的正则表达式：`!\[http://.*?\]`
+
+# 开发相关
+
+测试环境: `/Users/eric/Library/Mobile Documents/iCloud~md~obsidian/Documents/SandBox/.obsidian/plugins/md-to-halo-dev`
+在测试环境中进行开发，`git push`
+
+正式环境: `/Users/eric/Library/Mobile Documents/iCloud~md~obsidian/Documents/Yakumo/.obsidian/plugins/md-to-halo`
+在正式环境中进行发布，`git pull`
