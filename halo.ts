@@ -416,7 +416,8 @@ export const post_md = async (path: string, app: any): Promise<void> => {
                 content = content.replace(match[0], imgHtml);
             }
             const md = MarkdownIt({ html: true });
-            const html_content = md.render(content);
+            let html_content = md.render(content);
+html_content = custom_html(html_content);
             await update_title(post_name, title);
             await update(post_name, html_content);
             await update_tags(post_name, tags);
@@ -445,7 +446,8 @@ export const post_md = async (path: string, app: any): Promise<void> => {
                 content = content.replace(match[0], imgHtml);
             }
             const md = MarkdownIt({ html: true });
-            const html_content = md.render(content);
+            let html_content = md.render(content);
+html_content = custom_html(html_content);
             const post_name = await publish(title, html_content);
             if (post_name) {
                 await update_tags(post_name, tags);
@@ -473,7 +475,8 @@ export const post_md = async (path: string, app: any): Promise<void> => {
             content = content.replace(match[0], imgHtml);
         }
         const md = MarkdownIt({ html: true });
-        const html_content = md.render(content);
+        let html_content = md.render(content);
+        html_content = custom_html(html_content);
         //console.log(`title is ${title}`);
         //console.log(`html content is ${html_content}`);
         const post_name = await publish(title, html_content);
@@ -492,4 +495,33 @@ export const post_md = async (path: string, app: any): Promise<void> => {
         }
     }
     new Notice('发布Markdown文章完成', 5000);
+}
+
+
+function custom_html(html_content: string): string {
+    // 1. 在img标签后面加上一个空行的标签
+    html_content = html_content.replace(/<img[^>]*>/g, (match) => {
+        console.log('找到img标签:', match);
+        const result = `${match}\n</p>\n`;
+        console.log('添加空行后的结果:', result);
+        return result;
+    });
+
+    // 2. 查找 '<li>[ ] 事项</li>'，替换为未完成的todo图标
+    html_content = html_content.replace(/<li>\[ \] (.*?)<\/li>/g, (match, content) => {
+        console.log('找到未完成Todo:', match);
+        const result = `<span class="todo unchecked">⬜ ${content}</span><br>`;
+        console.log('替换后的结果:', result);
+        return result;
+    });
+
+    // 3. 查找 '<li>[x] 事项</li>'，替换为已完成的todo图标
+    html_content = html_content.replace(/<li>\[x\] (.*?)<\/li>/g, (match, content) => {
+        console.log('找到已完成Todo:', match);
+        const result = `<span class="todo checked">✅ ${content}</span><br>`;
+        console.log('替换后的结果:', result);
+        return result;
+    });
+
+    return html_content;
 }
