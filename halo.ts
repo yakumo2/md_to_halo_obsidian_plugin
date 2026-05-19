@@ -98,6 +98,7 @@ interface CreatePostRequest {
     content: string;
     raw: string;
     rawType: string;
+    version: number;
   };
 }
 
