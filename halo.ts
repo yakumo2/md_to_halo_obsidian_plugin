@@ -363,6 +363,7 @@ export async function post_md(mdPath: string, app: any): Promise<void> {
         .replace('<placeholder>', `${baseurl}/archives/${post_name}`);
       const updated_content = `---\n${final_yaml}\n---\n${original_content.replace(yaml_pattern, '').trim()}`;
       await app.vault.adapter.write(mdPath, updated_content);
+      new Notice('Markdown文章发布成功！', 5000);
     }
     return;
   }
@@ -386,7 +387,6 @@ export async function post_md(mdPath: string, app: any): Promise<void> {
     const new_yaml = `title: ${title}\ntags: []\nhalo_post_name: ${post_name}\nhalo_link: ${baseurl}/archives/${post_name}`;
     const updated_content = `---\n${new_yaml}\n---\n${original_content.replace(/^\s*---[\s\S]*?---\s*/m, '').trim()}`;
     await app.vault.adapter.write(mdPath, updated_content);
+    new Notice('Markdown文章发布成功！', 5000);
   }
-
-  new Notice('发布Markdown文章完成', 5000);
 }
