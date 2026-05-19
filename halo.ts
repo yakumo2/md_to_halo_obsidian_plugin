@@ -91,6 +91,16 @@ interface CreatePostPayload {
   };
 }
 
+/** Halo 创建文章 API 需要 post + content 两个字段 */
+interface CreatePostRequest {
+  post: CreatePostPayload;
+  content: {
+    content: string;
+    raw: string;
+    rawType: string;
+  };
+}
+
 // ─── API functions ────────────────────────────────────────────────
 
 function apiHeaders() {
@@ -164,43 +174,51 @@ async function publish(title: string, content: string): Promise<string | null> {
   const template = getSetting('HALO_TEMPLATE') || '';
   const categories: string[] = getCategories();
 
-  const payload: CreatePostPayload = {
-    apiVersion: 'content.halo.run/v1alpha1',
-    kind: 'Post',
-    metadata: {
-      annotations: {},
-      finalizers: ['content.halo.run/post-finalizer'],
-      generateName: '',
-      labels: {},
-      name: post_name,
-      version: 0,
+  const request: CreatePostRequest = {
+    post: {
+      apiVersion: 'content.halo.run/v1alpha1',
+      kind: 'Post',
+      metadata: {
+        annotations: {},
+        finalizers: ['content.halo.run/post-finalizer'],
+        generateName: '',
+        labels: {},
+        name: post_name,
+        version: 0,
+      },
+      spec: {
+        allowComment: true,
+        baseSnapshot: '',
+        categories: categories,
+        cover: '',
+        deleted: false,
+        excerpt: { autoGenerate: true, raw: '' },
+        headSnapshot: '',
+        htmlMetas: [],
+        owner: owner,
+        pinned: false,
+        priority: 0,
+        publish: true,
+        releaseSnapshot: '',
+        slug: post_slug,
+        tags: [],
+        template: template,
+        title: title,
+        visible: 'PUBLIC',
+      },
     },
-    spec: {
-      allowComment: true,
-      baseSnapshot: '',
-      categories: categories,
-      cover: '',
-      deleted: false,
-      excerpt: { autoGenerate: true, raw: '' },
-      headSnapshot: '',
-      htmlMetas: [],
-      owner: owner,
-      pinned: false,
-      priority: 0,
-      publish: true,
-      releaseSnapshot: '',
-      slug: post_slug,
-      tags: [],
-      template: template,
-      title: title,
-      visible: 'PUBLIC',
+    content: {
+      content: content,
+      raw: content,
+      rawType: 'HTML',
+      version: 0,
     },
   };
 
   try {
     const response = await axios.post(
       apiUrl('/apis/api.console.halo.run/v1alpha1/posts'),
-      payload,
+      request,
       { headers }
     );
     if (response.status === 200 || response.status === 201) {
