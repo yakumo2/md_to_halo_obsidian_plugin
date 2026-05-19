@@ -1,112 +1,64 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { post_md } from './halo.ts';
-import { setSettings } from './config.ts';
+import { App, Editor, MarkdownFileInfo, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { post_md } from './halo.js';
+import { setSettings } from './config.js';
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
+interface MdToHaloSettings {
 	HALO_BASEURL: string;
 	HALO_TOKEN: string;
 	IMAGE_URL: string;
 	IMAGE_TOKEN: string;
+	HALO_OWNER: string;
+	HALO_TEMPLATE: string;
+	HALO_CATEGORIES: string; // comma-separated
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: MdToHaloSettings = {
 	HALO_BASEURL: '',
 	HALO_TOKEN: '',
 	IMAGE_URL: '',
-	IMAGE_TOKEN: ''
+	IMAGE_TOKEN: '',
+	HALO_OWNER: 'admin',
+	HALO_TEMPLATE: '',
+	HALO_CATEGORIES: '',
 };
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class MdToHaloPlugin extends Plugin {
+	settings!: MdToHaloSettings;
 
 	async onload() {
-
-
-
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Publish to Halo', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
+		// Ribbon icon
+		this.addRibbonIcon('upload-cloud', 'Publish to Halo', () => {
 			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
 			if (activeView) {
 				const filePath = activeView.file?.path;
 				if (filePath) {
 					const file = this.app.vault.getAbstractFileByPath(filePath);
-					//console.log(`file path is ${filePath}`)
-					//console.log(`halo baseurl: ${this.settings.HALO_BASEURL}`)
 					if (file) {
-						//const fullPath = this.app.vault.adapter.getFullPath(file.path);
-						//console.log(`full path is ${fullPath}`)
 						post_md(filePath, this.app);
 					}
 				}
 			}
 		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
-		
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
+		// Commands
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
+			id: 'publish-to-halo',
+			name: 'Publish current note to Halo',
+			editorCallback: (_editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
+				const filePath = ctx.file?.path;
+				if (filePath) {
+					post_md(filePath, this.app);
 				}
-			}
+			},
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		// Settings tab
+		this.addSettingTab(new MdToHaloSettingTab(this.app, this));
 	}
 
-	onunload() {
-
-	}
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -118,88 +70,119 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
+class MdToHaloSettingTab extends PluginSettingTab {
+	plugin: MdToHaloPlugin;
+
+	constructor(app: App, plugin: MdToHaloPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
 	}
 
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
+	display(): void {
+		const { containerEl } = this;
+		containerEl.empty();
 
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-  display(): void {
-    const {containerEl} = this;
-    containerEl.empty();
-
-    // 添加通用设置标题
-    containerEl.createEl('h2', { text: 'General Setting' });
+		containerEl.createEl('h2', { text: 'Halo Blog' });
 
 		new Setting(containerEl)
-			.setName('HALO Base URL')
-			.setDesc('Halo博客的地址')
-			.addText(text => text
-				.setPlaceholder('http://halo.example.com')
-				.setValue(this.plugin.settings.HALO_BASEURL)
-				.onChange(async (value) => {
-					this.plugin.settings.HALO_BASEURL = value;
-					await this.plugin.saveSettings();
-				}));
+			.setName('Halo Base URL')
+			.setDesc('Halo 博客地址，例如 https://halo.example.com')
+			.addText((text) =>
+				text
+					.setPlaceholder('https://halo.example.com')
+					.setValue(this.plugin.settings.HALO_BASEURL)
+					.onChange(async (value) => {
+						this.plugin.settings.HALO_BASEURL = value;
+						await this.plugin.saveSettings();
+					})
+			);
 
 		new Setting(containerEl)
-			.setName('HALO Token')
-			.setDesc('Halo API的访问令牌')
-			.addText(text => text
-				.setPlaceholder('pat_xxxxxx')
-				.setValue(this.plugin.settings.HALO_TOKEN)
-				.onChange(async (value) => {
-					this.plugin.settings.HALO_TOKEN = value;
-					await this.plugin.saveSettings();
-				}));
+			.setName('Halo Token')
+			.setDesc('Halo API 的访问令牌 (Personal Access Token)')
+			.addText((text) =>
+				text
+					.setPlaceholder('pat_xxxxxx')
+					.setValue(this.plugin.settings.HALO_TOKEN)
+					.onChange(async (value) => {
+						this.plugin.settings.HALO_TOKEN = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Halo Owner')
+			.setDesc('Halo 用户名（文章归属的 owner），默认 admin')
+			.addText((text) =>
+				text
+					.setPlaceholder('admin')
+					.setValue(this.plugin.settings.HALO_OWNER)
+					.onChange(async (value) => {
+						this.plugin.settings.HALO_OWNER = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Halo Template')
+			.setDesc('发布时使用的模板名称，留空则使用默认模板')
+			.addText((text) =>
+				text
+					.setPlaceholder('your-template')
+					.setValue(this.plugin.settings.HALO_TEMPLATE)
+					.onChange(async (value) => {
+						this.plugin.settings.HALO_TEMPLATE = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Halo Categories')
+			.setDesc('文章分类的 metadata.name，多个用逗号分隔，例如 category-a,category-b')
+			.addText((text) =>
+				text
+					.setPlaceholder('category-a,category-b')
+					.setValue(this.plugin.settings.HALO_CATEGORIES)
+					.onChange(async (value) => {
+						this.plugin.settings.HALO_CATEGORIES = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		containerEl.createEl('h2', { text: 'Image Hosting' });
 
 		new Setting(containerEl)
 			.setName('Image URL')
-			.setDesc('easyimage2的API地址')
-			.addText(text => text
-				.setPlaceholder('http://image.example.com/api')
-				.setValue(this.plugin.settings.IMAGE_URL)
-				.onChange(async (value) => {
-					this.plugin.settings.IMAGE_URL = value;
-					await this.plugin.saveSettings();
-				}));
+			.setDesc('EasyImage2 的 API 地址')
+			.addText((text) =>
+				text
+					.setPlaceholder('https://image.example.com/api/index.php')
+					.setValue(this.plugin.settings.IMAGE_URL)
+					.onChange(async (value) => {
+						this.plugin.settings.IMAGE_URL = value;
+						await this.plugin.saveSettings();
+					})
+			);
 
 		new Setting(containerEl)
 			.setName('Image Token')
-			.setDesc('easyimage2图床API的访问令牌')
-			.addText(text => text
-				.setPlaceholder('your_image_token')
-				.setValue(this.plugin.settings.IMAGE_TOKEN)
-				.onChange(async (value) => {
-					this.plugin.settings.IMAGE_TOKEN = value;
-					await this.plugin.saveSettings();
-				}));
+			.setDesc('EasyImage2 图床 API 的访问令牌')
+			.addText((text) =>
+				text
+					.setPlaceholder('your_image_token')
+					.setValue(this.plugin.settings.IMAGE_TOKEN)
+					.onChange(async (value) => {
+						this.plugin.settings.IMAGE_TOKEN = value;
+						await this.plugin.saveSettings();
+					})
+			);
 
- 
-    const donateDiv = containerEl.createDiv();
-    donateDiv.style.marginTop = '2em';
-
-    
-    donateDiv.createEl('p', {
-      text: 'If you find this plugin helpful, send me an email to give some encouragement.',
-      attr: { style: 'text-align: center; margin: 10px 0;' }
-    });
-    
-    const link = donateDiv.createEl('a', {
-      text: 'Send Me An Email',
-      href: 'mailto:monkhead@126.com',
-      attr: { style: 'display: block; text-align: center;' }
-    });
-  }
+		containerEl.createEl('h2', { text: 'About' });
+		containerEl.createEl('p', { text: 'If you find this plugin helpful, ' });
+		const emailLink = containerEl.createEl('a', {
+			text: 'Send Me An Email',
+			href: 'mailto:monkhead@126.com',
+		});
+		emailLink.setAttribute('style', 'text-align: center;');
+	}
 }

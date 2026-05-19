@@ -1,80 +1,93 @@
-# 关于 🎲 md-to-halo 🎲
+# Markdown to Halo
 
-本插件是为了把obsidian的markdown文件上传到halo博客中。
+An Obsidian plugin that publishes Markdown notes to a [Halo](https://www.halo.run/) blog.
 
-# 安装
+![Logo](https://img.shields.io/badge/Platform-Obsidian-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-进入vault的plugin文件夹，一般是`/Users/<user>/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault name>/.obsidian/plugins/`
+## Features
 
-`git clone`本项目之后，进入项目文件夹
+- 📝 **Publish Markdown to Halo** — converts Markdown → HTML and posts via Halo API
+- 🏷️ **YAML frontmatter support** — reads `title` and `tags`, writes back `halo_post_name` and `halo_link` for future updates
+- 🖼️ **Auto image upload** — uploads local images to [EasyImage2](https://github.com/icret/EasyImages2.0) image hosting, replaces links in HTML
+- 🔁 **Update existing posts** — if `halo_post_name` exists in YAML, updates instead of creating a new post
+- 📱 **Desktop & Mobile** — works on both platforms
 
-```
-pnpm install
-pnpm run dev
-```
-安装完成。
+## Installation
 
-# 启动
+### Option A: Via BRAT (Recommended)
 
-在Obsidian-preferences中，打开插件，启用本插件。
-如果对插件有修改，需要重新`pnpm run dev`，然后回到preferences中关闭和重新启用插件，让修改生效。
+1. Install the [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin from Obsidian's community plugins
+2. Open BRAT settings → "Add Beta Plugin"
+3. Enter this repo URL: `https://github.com/yakumo2/md_to_halo_obsidian_plugin`
+4. Enable the plugin in Obsidian settings
 
-# 需求
+### Option B: Manual Install
 
-- Halo博客 [官网](https://www.halo.run/)
-- easyimage2图床 [github](https://github.com/icret/EasyImages2.0)
-- 1panel [官网](https://1panel.cn/) 非必须，我是用1panel安装的halo和easyimage2
+1. Download `main.js`, `manifest.json`, and `styles.css` from the latest [GitHub Release](https://github.com/yakumo2/md_to_halo_obsidian_plugin/releases)
+2. Place them in your vault's `.obsidian/plugins/md-to-halo/` folder
+3. Enable in Obsidian → Settings → Community plugins
 
-# 设定
+## Setup
 
-在插件设置中，设定下列参数:
-- "HALO_BASEURL": "http://your.halo.com" 你的halo地址
-- "HALO_TOKEN": "pat_eyJr" 在halo中生成的token
-- "IMAGE_URL": "http://image.kanepo.com/api/index.php" 你的easyimage2的api地址，在后台中找
-- "IMAGE_TOKEN": "xx111yyy222zzz" 你的easyimage2的token
+1. Enable the plugin in Obsidian settings
+2. Configure the following in the plugin settings:
 
-# 功能
+| Setting | Description | Example |
+|---------|-------------|---------|
+| **Halo Base URL** | Your Halo blog URL | `https://halo.example.com` |
+| **Halo Token** | Halo Personal Access Token | `pat_xxxxxx` |
+| **Halo Owner** | Halo username for article ownership | `admin` |
+| **Halo Template** | Theme/template name (optional, leave blank for default) | `default` |
+| **Halo Categories** | Category metadata.name, comma-separated | `tech,life` |
+| **Image URL** | EasyImage2 API endpoint | `https://image.example.com/api/index.php` |
+| **Image Token** | EasyImage2 API token | `your_token` |
 
-- 把markdown文件转为html上传到halo
-- 读取yaml中的title(如果没有则用文件名)和tags，并上传到halo
-- 自动添加halo的文章id和链接到yaml中
-- 自动上传图片到easyimage2图床，在html中替换为图片链接，并且在markdown中替换图片alt为图片链接
-- 如果图片的alt为http的链接，则不重新上传图片，直接替换为链接
-- 电脑端和手机端支持(手机端需要通过icloud同步)
+## Usage
 
-# yaml格式
+1. Open a Markdown note in Obsidian
+2. Click the **Publish to Halo** ribbon icon (☁️ upload icon) or use the command palette: "Publish current note to Halo"
+3. The plugin will:
+   - Parse YAML frontmatter (if present) for `title` and `tags`
+   - Upload local images to your EasyImage2 instance
+   - Convert Markdown → HTML and publish to Halo
+   - Write `halo_post_name` and `halo_link` back to the note's YAML
 
-尤其注意一下tags的格式。
-```
+## YAML Format
+
+```yaml
 ---
-title: 标题
+title: Your Title
 tags:
   - tag1
   - tag2
 halo_post_name: f5b036d1-8290-41da-a928-220c0ee0ffe4
-halo_link: http://halo.kanepo.com/archives/f5b036d1-8290-41da-a928-220c0ee0ffe4
+halo_link: https://halo.example.com/archives/f5b036d1-8290-41da-a928-220c0ee0ffe4
 ---
 ```
 
-# 使用
+- If `halo_post_name` exists, the plugin **updates** the existing Halo post
+- If absent, the plugin **creates** a new post and writes the ID back
 
-- 点击插件按钮(一个骰子🎲)，上传当前文件
+### Resetting
 
-# 清除
-- 如果需要重新发布，或者需要发布到其他halo博客，需要清除halo_post_name和halo_link。
-- 如果要重新上传图片，需要清除图片的alt。清除图片的alt比较复杂，需要安装`Text Finder`(作者:`hafuhafu`)这个插件才能支持正则表达式的查找和替换，可以用下面的正则表达式：`!\[http://.*?\]`
+To re-publish as a new article (or to a different Halo instance), delete `halo_post_name` and `halo_link` from the YAML.
 
-# 开发相关
+## Requirements
 
-测试环境: `/Users/eric/Library/Mobile Documents/iCloud~md~obsidian/Documents/SandBox/.obsidian/plugins/md-to-halo-dev`
-在测试环境中进行开发，`git push -u origin main`
+- [Halo Blog](https://www.halo.run/) (v2.x)
+- [EasyImage2](https://github.com/icret/EasyImages2.0) for image hosting (optional, but images won't be uploaded without it)
 
-## 开发环境设定
-有时候需要检查一下本地git仓库配置是否正确：
-`git remote -v`
-如果没有配置正确，需要配置：
-`git remote add origin https://github.com/yakumo2/md_to_halo_obsidian_plugin.git`
+## Development
 
+```bash
+git clone https://github.com/yakumo2/md_to_halo_obsidian_plugin.git
+cd md_to_halo_obsidian_plugin
+pnpm install
+pnpm run dev      # watch mode
+pnpm run build    # production build
+```
 
-正式环境: `/Users/eric/Library/Mobile Documents/iCloud~md~obsidian/Documents/Yakumo/.obsidian/plugins/md-to-halo`
-在正式环境中进行发布，`git pull`
+## License
+
+MIT

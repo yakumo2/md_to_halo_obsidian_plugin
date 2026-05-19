@@ -1,11 +1,11 @@
 {
 	"id": "md-to-halo",
 	"name": "Markdown to Halo",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Send your markdown files to Halo",
+	"version": "1.1.0",
+	"minAppVersion": "1.0.0",
+	"description": "Publish Markdown notes from Obsidian to Halo blog",
 	"author": "Yakumo2",
-	"authorUrl": "https://halo.yakumo2.uk",
+	"authorUrl": "https://github.com/yakumo2",
 	"fundingUrl": "https://halo.yakumo2.uk",
 	"isDesktopOnly": false
 }
