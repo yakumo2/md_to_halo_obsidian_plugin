@@ -113,7 +113,9 @@ function apiHeaders() {
 }
 
 function apiUrl(path: string) {
-  return `${getSetting('HALO_BASEURL')}${path}`;
+  const base = getSetting('HALO_BASEURL').replace(/\/$/, '');
+  const p = path.startsWith('/') ? path : '/' + path;
+  return `${base}${p}`;
 }
 
 async function update_title(name: string, title: string): Promise<void> {
